@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drug Solubility Predictor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding-top: 80px; /* Adjusted for fixed navbar */
+        }
+        .navbar {
+            display: flex;
+            align-items: center;
+            padding: 0 2em;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            z-index: 1000;
+        }
+        .navbar-logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+        .navbar-logo svg {
+            width: 40px;
+            height: 40px;
+            margin-right: 15px;
+        }
+        .navbar-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #2c3e50;
+            white-space: nowrap;
+        }
+        .navbar-links {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+        }
+        .navbar-links a {
+            color: #34495e;
+            text-decoration: none;
+            font-size: 1em;
+            font-weight: 500;
+            margin: 0 20px;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .navbar-links a:hover, .navbar-links a.active {
+            background-color: #f2f2f2;
+        }
+
+        .main-content {
+            padding: 2em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 2em 3em;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 1200px;
+            width: 100%;
+            z-index: 10;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        p.project-description {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 2em;
+        }
+        .form-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2em;
+            align-items: flex-start;
+            border-bottom: 1px solid #ecf0f1;
+            padding-bottom: 2em;
+        }
+        .form-fields {
+             display: flex;
+             flex-direction: column;
+             gap: 1.5em;
+        }
+        .form-group { margin-bottom: 0; }
+        label {
+            display: inline-block;
+            margin-bottom: 0.5em;
+            font-weight: bold;
+            color: #34495e;
+        }
+        .inline-illustration {
+            width: 30px; height: 30px; vertical-align: middle;
+            margin-left: 10px; opacity: 0.7;
+        }
+        input, select {
+            width: 100%;
+            padding: 0.8em;
+            box-sizing: border-box;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 0.9em;
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background 0.3s;
+        }
+        button:hover {
+             background: linear-gradient(45deg, #2980b9, #3498db);
+        }
+        #result-section { display: none; margin-top: 2em; }
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5em;
+            margin-top: 2em;
+        }
+        .result-card {
+            border: 1px solid #ecf0f1;
+            border-radius: 8px;
+            padding: 1.5em;
+            text-align: center;
+            background-color: #fafafa;
+            transition: box-shadow 0.3s;
+        }
+        .result-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        .result-card h3 {
+            color: #34495e;
+            margin-top: 0;
+            font-size: 1.1em;
+        }
+        .prediction-value {
+            font-size: 1.1em;
+            color: #2c3e50;
+            margin-bottom: 0.5em;
+        }
+        .solubility-badge {
+            display: inline-block;
+            padding: 0.4em 0.8em;
+            border-radius: 12px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        .molecule-image { margin-top: 1em; text-align: center; }
+        .molecule-image svg { max-width: 100%; height: auto; }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            display: none;
+            margin: 2em auto 0;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .fusion-result-container {
+            margin-top: 2em;
+            border-top: 2px solid #3498db;
+            padding-top: 2em;
+        }
+        .fusion-result-card {
+             background: #eaf5ff;
+             border: 1px solid #aed6f1;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-logo">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M 50,10 L 80,30 L 80,70 L 50,90 L 20,70 L 20,30 Z" fill="none" stroke="#3498db" stroke-width="5"/><path d="M 50,10 L 50,40 M 50,90 L 50,60" fill="none" stroke="#3498db" stroke-width="3"/><circle cx="50" cy="50" r="10" fill="#2ecc71" /></svg>
+            <span class="navbar-title">Solubility Predictor</span>
+        </a>
+        <div class="navbar-links">
+            <a href="/analysis">Data Analysis</a>
+            <a href="/predictor" class="active">Predictor</a>
+        </div>
+    </nav>
+    
+    <div class="main-content">
+        <div class="container">
+            <h1>Solubility Prediction</h1>
+            <p class="project-description">Input a drug's SMILES string, select a solvent, specify the temperature, and get solubility predictions from multiple models including Morgan Fingerprint, GIN Graph Learning, and SMILES RNN.</p>
+            
+            <div class="form-container">
+                <form id="predict-form" class="form-fields">
+                    <div class="form-group">
+                        <label for="drug_smiles">Drug SMILES String <img src="/static/image.png" alt="molecule" class="inline-illustration"></label>
+                        <input type="text" id="drug_smiles" name="drug_smiles" value="CC(=O)Oc1ccccc1C(=O)O" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="solvent_select">Solvent <img src="/static/image2.png" alt="flask" class="inline-illustration"></label>
+                        <select id="solvent_select" name="solvent_smiles">
+                            {% for name, smiles in solvents_sorted %}
+                                <option value="{{ smiles }}" {% if name == '1-Octanol' %}selected{% endif %}>{{ name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="temperature">Temperature (°C) <img src="/static/image3.png" alt="temperature" class="inline-illustration"></label>
+                        <input type="number" id="temperature" name="temperature" value="25.0" step="0.1" required>
+                    </div>
+                    <button type="submit">Predict All Models</button>
+                </form>
+                <div class="molecule-image" id="plain-molecule-display">
+                    <h3>Input Molecule</h3>
+                    <p>Enter a SMILES string to see the molecule structure.</p>
+                </div>
+            </div>
+
+            <div class="spinner" id="spinner"></div>
+
+            <div id="result-section">
+                <h2>Base Model Predictions</h2>
+                <div class="results-grid">
+                    <div class="result-card" id="morgan-results"></div>
+                    <div class="result-card" id="mfp-results"></div>
+                    <div class="result-card" id="gcn-results"></div>
+                    <div class="result-card" id="smiles-results"></div>
+                </div>
+                <div class="fusion-result-container">
+                    <h2>Final Fusion Model</h2>
+                    <div class="result-card fusion-result-card" id="multimodal-results">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('predict-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const drug_smiles = document.getElementById('drug_smiles').value;
+            const solvent_smiles = document.getElementById('solvent_select').value;
+            const temperature = document.getElementById('temperature').value;
+            
+            const resultSection = document.getElementById('result-section');
+            const spinner = document.getElementById('spinner');
+
+            resultSection.style.display = 'none';
+            spinner.style.display = 'block';
+            document.getElementById('plain-molecule-display').innerHTML = '<h3>Input Molecule</h3><p>Loading structure...</p>';
+
+
+            fetch('/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ drug_smiles, solvent_smiles, temperature })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw new Error(err.error || 'Server error') });
+                }
+                return response.json();
+            })
+            .then(data => {
+                spinner.style.display = 'none';
+                resultSection.style.display = 'block';
+                
+                document.getElementById('plain-molecule-display').innerHTML = `<h3>Input Molecule</h3>${data.plain_svg || '<p>Could not generate structure</p>'}`;
+
+                const createCardContent = (modelData, title, showContrib) => {
+                    if (!modelData || modelData.prediction === null) {
+                        return `
+                            <h3>${title}</h3>
+                            <div class="prediction-value">Prediction: <strong>N/A</strong></div>
+                            <div style="text-align:center;"><span class="solubility-badge" style="background-color:#95a5a6">Error</span></div>
+                            <div class="molecule-image"><p><i>Model error or incompatible data</i></p></div>`;
+                    }
+                    let imageHtml = '<p><i>Atom contribution not available for this model.</i></p>';
+                    if (showContrib && modelData.contrib_svg) {
+                        imageHtml = modelData.contrib_svg;
+                    }
+                    return `
+                        <h3>${title}</h3>
+                        <div class="prediction-value">Prediction: <strong>${modelData.prediction.toFixed(4)}</strong></div>
+                        <div style="text-align:center;"><span class="solubility-badge" style="background-color:${modelData.color}">${modelData.level}</span></div>
+                        <div class="molecule-image">${imageHtml}</div>`;
+                };
+
+                document.getElementById('morgan-results').innerHTML = createCardContent(data.morgan, 'Morgan FFNN', true);
+                document.getElementById('mfp-results').innerHTML = createCardContent(data.mfp, 'Multi-FP FFNN', false);
+                if (data.gcn && data.gcn.prediction !== null) {
+                    const ginSvg = data.gcn.gin_contrib_svg || data.gcn.gin_plain_svg || data.plain_svg || '';
+                    document.getElementById('gcn-results').innerHTML = `
+                        <h3>GIN</h3>
+                        <div class="prediction-value">Prediction: <strong>${data.gcn.prediction.toFixed(4)}</strong></div>
+                        <div style="text-align:center;"><span class="solubility-badge" style="background-color:${data.gcn.color}">${data.gcn.level}</span></div>
+                        <div class="molecule-image">${ginSvg || '<p><i>Pre-trained with AqSolDB & BigSolDB</i></p>'}</div>`;
+                } else {
+                    document.getElementById('gcn-results').innerHTML = `
+                        <h3>GIN</h3>
+                        <div class="prediction-value">Prediction: <strong>N/A</strong></div>
+                        <div style="text-align:center;"><span class="solubility-badge" style="background-color:#95a5a6">Error</span></div>
+                        <div class="molecule-image"><p><i>Could not process SMILES</i></p></div>`;
+                }
+                document.getElementById('smiles-results').innerHTML = createCardContent(data.smiles, 'SMILES RNN', false);
+
+                const multiCard = document.getElementById('multimodal-results');
+                if (data.multimodal && data.multimodal.prediction !== null) {
+                    multiCard.innerHTML = `
+                        <h3>&#11088; Best Prediction &#11088;</h3>
+                        <div class="prediction-value">Prediction: <strong>${data.multimodal.prediction.toFixed(4)}</strong></div>
+                        <div style="text-align:center;"><span class="solubility-badge" style="background-color:${data.multimodal.color}">${data.multimodal.level}</span></div>
+                        <p style="margin-top:1em;"><i>This model fuses features from the MFP, GCN, and SMILES models for the most accurate prediction.</i></p>`;
+                } else {
+                    multiCard.innerHTML = `
+                        <h3>&#11088; Best Prediction &#11088;</h3>
+                        <div class="prediction-value">Prediction: <strong>N/A</strong></div>
+                        <div style="text-align:center;"><span class="solubility-badge" style="background-color:#95a5a6">Error</span></div>
+                        <p style="margin-top:1em;"><i>Requires MFP, GCN, and SMILES models to work properly.</i></p>`;
+                }
+                
+            })
+            .catch(error => {
+                spinner.style.display = 'none';
+                resultSection.style.display = 'none';
+                document.getElementById('plain-molecule-display').innerHTML = `<h3 style="color: #e74c3c;">Error</h3><p>${error.message}</p>`;
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>

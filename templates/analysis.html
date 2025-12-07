@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Analysis - Solubility Predictor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding-top: 80px; /* For fixed navbar */
+        }
+        
+        /* --- Navigation Bar --- */
+        .navbar {
+            display: flex;
+            align-items: center;
+            padding: 0 2em;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            z-index: 1000;
+        }
+        .navbar-logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+        .navbar-logo svg {
+            width: 40px;
+            height: 40px;
+            margin-right: 15px;
+        }
+        .navbar-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #2c3e50;
+            white-space: nowrap;
+        }
+        .navbar-links {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+        }
+        .navbar-links a {
+            color: #34495e;
+            text-decoration: none;
+            font-size: 1em;
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .navbar-links a:hover, .navbar-links a.active {
+            background-color: #f2f2f2;
+        }
+
+        .main-content {
+            padding: 0 2em; /* Adjusted padding */
+            margin-top: -3em; /* Increased negative margin to move up more */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to top */
+            width: 100%;
+            box-sizing: border-box;
+            gap: 2em;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 2em 3em;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+
+        .legend-container {
+            flex-basis: 35%;
+            max-width: 350px;
+        }
+
+        .chart-container-wrapper {
+            flex-basis: 65%;
+            max-width: 600px;
+        }
+
+        h1, h2 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        h1 { margin-bottom: 1.5em; }
+        h2 { margin-bottom: 1em; }
+        h4 {
+            color: #34495e;
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+            border-bottom: 1px solid #ecf0f1;
+            padding-bottom: 0.5em;
+        }
+
+        #chart-container {
+            position: relative;
+            width: 100%;
+            margin: auto;
+        }
+
+        .legend-list {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+        }
+        .legend-list li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.8em;
+            font-size: 0.95em;
+        }
+        .legend-dot {
+            flex-shrink: 0;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .legend-label {
+            flex-grow: 1;
+            color: #34495e;
+        }
+        .legend-value {
+            font-weight: 700;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-logo">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 50,10 L 80,30 L 80,70 L 50,90 L 20,70 L 20,30 Z" fill="none" stroke="#3498db" stroke-width="5"/>
+                <path d="M 50,10 L 50,40 M 50,90 L 50,60" fill="none" stroke="#3498db" stroke-width="3"/>
+                <circle cx="50" cy="50" r="10" fill="#2ecc71" />
+            </svg>
+            <span class="navbar-title">Solubility Predictor</span>
+        </a>
+        <div class="navbar-links">
+            <a href="/analysis" class="active">Data Analysis</a> <!-- Swapped order, Data Analysis is active -->
+            <a href="/predictor">Predictor</a>
+        </div>
+    </nav>
+
+    <!-- Only one illustration left: image.png for top-left -->
+    <img src="{{ url_for('static', filename='image.png') }}" class="static-illustration static-illustration-tl" alt="Experimental Instrument" style="z-index: 1; opacity: 0.1;">
+
+    <div class="main-content">
+        <div class="container legend-container">
+            <h2>Solvent Category</h2>
+            <h4>Top 5 Solvents (Inner Ring)</h4>
+            <ul class="legend-list">
+                {% for item in inner_legend_data %}
+                <li>
+                    <span class="legend-dot" style="background-color: {{ item.color }}"></span>
+                    <span class="legend-label">{{ item.label }}</span>
+                    <span class="legend-value">{{ item.value }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+            <h4>Next Categories (Outer Ring)</h4>
+            <ul class="legend-list">
+                {% for item in outer_legend_data %}
+                <li>
+                    <span class="legend-dot" style="background-color: {{ item.color }}"></span>
+                    <span class="legend-label">{{ item.label }}</span>
+                    <span class="legend-value">{{ item.value }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="container chart-container-wrapper">
+            <h1>Solvent Distribution</h1>
+            <div id="chart-container">
+                <canvas id="solventDoughnutChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Plugin to draw image in the center
+        const centerImagePlugin = {
+            id: 'centerImage',
+            afterDraw: (chart) => {
+                const image = new Image();
+                image.src = "{{ url_for('static', filename='image4.png') }}";
+                if (image.complete) {
+                    const ctx = chart.ctx;
+                    const chartArea = chart.chartArea;
+                    const centerX = (chartArea.left + chartArea.right) / 2;
+                    const centerY = (chartArea.top + chartArea.bottom) / 2;
+                    const imageSize = Math.min(chartArea.width, chartArea.height) / 3;
+                    ctx.drawImage(image, centerX - imageSize / 2, centerY - imageSize / 2, imageSize, imageSize);
+                } else {
+                    image.onload = () => chart.draw();
+                }
+            }
+        };
+
+        const ctx = document.getElementById('solventDoughnutChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: {{ all_labels | tojson }},
+                datasets: [
+                    {
+                        label: 'Top 5 Solvents',
+                        data: {{ inner_values | tojson }},
+                        backgroundColor: {{ inner_colors | tojson }},
+                        borderColor: '#ffffff',
+                        borderWidth: 2,
+                        hoverOffset: 20
+                    },
+                    {
+                        label: 'Next Categories',
+                        data: {{ outer_values | tojson }},
+                        backgroundColor: {{ outer_colors | tojson }},
+                        borderColor: '#ffffff',
+                        borderWidth: 2,
+                        hoverOffset: 20
+                    }
+                ]
+            },
+            plugins: [centerImagePlugin],
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false // We have a custom legend now
+                    },
+                    title: {
+                        display: true,
+                        text: 'Nested Solvent Distribution'
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

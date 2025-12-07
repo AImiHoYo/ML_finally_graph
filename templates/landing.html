@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome - Drug Solubility Predictor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f7f6;
+            overflow: hidden;
+        }
+        .splash-container {
+            display: flex;
+            height: 100%;
+            width: 100%;
+            align-items: center;
+            justify-content: center;
+        }
+        .left-panel {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            background: linear-gradient(135deg, #3a7bd5, #3a6073);
+        }
+        .main-illustration {
+            width: 60%;
+            max-width: 500px;
+            animation: float 6s ease-in-out infinite;
+        }
+        .right-panel {
+            flex: 1;
+            padding: 4em;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        h1 {
+            font-size: 3.5em;
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 0.2em;
+        }
+        h2 {
+            font-size: 1.5em;
+            color: #3498db;
+            font-weight: 400;
+            margin-bottom: 1.5em;
+        }
+        .description {
+            font-size: 1.1em;
+            color: #7f8c8d;
+            line-height: 1.6;
+            max-width: 500px;
+            margin-bottom: 2.5em;
+        }
+        .start-button {
+            display: inline-block;
+            padding: 1em 2.5em;
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            text-decoration: none;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .start-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+        }
+        .project-members-landing { /* New style for members on landing page */
+            font-size: 0.9em;
+            color: #7f8c8d;
+            line-height: 1.5;
+            margin-top: 2em; /* Added margin */
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="splash-container">
+        <div class="left-panel">
+            <svg class="main-illustration" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <g transform="translate(100 100)">
+                    <defs>
+                        <radialGradient id="grad1" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                            <stop offset="0%" style="stop-color:rgb(255,255,255);stop-opacity:0.3" />
+                            <stop offset="100%" style="stop-color:rgb(255,255,255);stop-opacity:0" />
+                        </radialGradient>
+                    </defs>
+                    <circle cx="0" cy="0" r="12" fill="#fff"/>
+                    <g id="orbits">
+                        <circle cx="0" cy="0" r="30" stroke="#fff" stroke-width="1" fill="none" stroke-opacity="0.5"/>
+                        <circle cx="0" cy="0" r="60" stroke="#fff" stroke-width="1" fill="none" stroke-opacity="0.5"/>
+                        <circle cx="0" cy="0" r="90" stroke="#fff" stroke-width="1" fill="none" stroke-opacity="0.5"/>
+                    </g>
+                    <g id="electrons">
+                        <g style="animation: rotate-slow 12s linear infinite;">
+                            <circle cx="30" cy="0" r="5" fill="#fff"/>
+                        </g>
+                        <g style="animation: rotate-slow 8s linear infinite reverse;">
+                            <circle cx="0" cy="-60" r="5" fill="#fff"/>
+                        </g>
+                        <g style="animation: rotate-slow 10s linear infinite;">
+                             <circle cx="-90" cy="0" r="5" fill="#fff"/>
+                        </g>
+                    </g>
+                     <circle cx="0" cy="0" r="95" fill="url(#grad1)" />
+                </g>
+                <style> @keyframes rotate-slow { from { transform-origin: center; transform: rotate(0deg); } to { transform-origin: center; transform: rotate(360deg); } } </style>
+            </svg>
+        </div>
+        <div class="right-panel">
+            <h1>Solubility Predictor</h1>
+            <h2>COMP6133 Course Project</h2>
+            <p class="description">
+                An intelligent web application that leverages a deep learning model to predict drug solubility. 
+                This tool provides real-time predictions, visualizes molecular structures, and offers insights into atomic contributions.
+            </p>
+            <a href="/analysis" class="start-button">Start Application</a> <!-- Changed href to /analysis -->
+            <p class="project-members-landing">
+                <strong>Project Members:</strong><br>
+                P2522787 王濤<br>
+                P2523288 王天之<br>
+                P2523463 江世韜<br>
+                P2523005 陳聖熙
+            </p>
+        </div>
+    </div>
+</body>
+</html>
